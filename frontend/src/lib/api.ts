@@ -33,8 +33,8 @@ export async function getPaper(id: number) {
     return paper;
 };
 
-export async function createPaper({ input } : { input: CreatePaper }) {
-    const res = await api.papers.$post({ json: input });
+export async function createPaper({ value } : { value: CreatePaper }) {
+    const res = await api.papers.$post({ json: value });
     if (!res.ok) {
         throw new Error("Failed to create paper");
     }
@@ -43,7 +43,7 @@ export async function createPaper({ input } : { input: CreatePaper }) {
 };
 
 export const loadingCreatePaperQueryOptions = queryOptions<{
-    paper?: CreatePaper, 
+    paper?: CreatePaper; 
 }>({
     queryKey: ["loading-create-paper"],
     queryFn: async () => {

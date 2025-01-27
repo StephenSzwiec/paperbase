@@ -37,7 +37,7 @@ function Papers() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Title</TableHead>
+            <TableHead>paper_title</TableHead>
             <TableHead>Authors</TableHead>
             <TableHead>Year</TableHead>
             <TableHead>Journal</TableHead>
@@ -51,7 +51,7 @@ function Papers() {
               <TableCell className="font-medium">
                 <Skeleton className="h-4" />
               </TableCell>
-              <TableCell>{loadingCreatePaper?.paper.title}</TableCell>
+              <TableCell>{loadingCreatePaper?.paper.paper_title}</TableCell>
               <TableCell>{loadingCreatePaper?.paper.authors}</TableCell>
               <TableCell>{loadingCreatePaper?.paper.year}</TableCell>
               <TableCell>{loadingCreatePaper?.paper.journal}</TableCell>
@@ -87,7 +87,7 @@ function Papers() {
             : data?.papers.map((paper) => (
                 <TableRow key={paper.id}>
                   <TableCell className="font-medium">{paper.id}</TableCell>
-                  <TableCell>{paper.title}</TableCell>
+                  <TableCell>{paper.paper_title}</TableCell>
                   <TableCell>{paper.authors}</TableCell>
                   <TableCell>{paper.year}</TableCell>
                   <TableCell>{paper.journal}</TableCell>

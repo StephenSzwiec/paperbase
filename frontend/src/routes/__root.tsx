@@ -3,7 +3,7 @@ import {
     Link,
     Outlet,
 } from "@tanstack/react-router";
-import { Footer } from "../components/ui/footer";
+import { Toaster } from "@/components/ui/sonner";
 import { type QueryClient } from "@tanstack/react-query";
 
 interface MyRouterContext {
@@ -36,7 +36,7 @@ function Root() {
                 <Outlet />
             </div>
             <hr />
-            <Footer />
+            <Toaster />
         </>
     );
 }
