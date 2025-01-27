@@ -1,14 +1,14 @@
 import {
-    insertPaperSchema,
-    insertCompoundSchema 
+    insertPapersSchema,
+    insertCompoundsSchema 
 } from './schema';
 import { z } from 'zod';
 
-export const createPaperSchema = insertPaperSchema.omit({
+export const createPaperSchema = insertPapersSchema.omit({
     id: true
 });
 
-export const createCompoundSchema = insertCompoundSchema.omit({
+export const createCompoundSchema = insertCompoundsSchema.omit({
     id: true, 
     paperId: true
 });
