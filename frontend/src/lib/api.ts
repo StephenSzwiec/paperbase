@@ -22,9 +22,9 @@ export const getAllPapersQueryOptions = queryOptions({
     staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
-export async function getPaper(paperId: number) {
+export async function getPaper(id: number) {
     const res = await api.papers[":id"].$get({
-        param: { id: paperId.toString() },
+        param: { id: id.toString() },
     });
     if (!res.ok) {
         throw new Error("Failed to fetch paper");

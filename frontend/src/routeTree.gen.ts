@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as PapersImport } from './routes/papers'
+import { Route as CreateImport } from './routes/create'
 import { Route as AboutImport } from './routes/about'
 
 // Create/Update Routes
@@ -19,6 +20,12 @@ import { Route as AboutImport } from './routes/about'
 const PapersRoute = PapersImport.update({
   id: '/papers',
   path: '/papers',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CreateRoute = CreateImport.update({
+  id: '/create',
+  path: '/create',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,6 +46,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateImport
+      parentRoute: typeof rootRoute
+    }
     '/papers': {
       id: '/papers'
       path: '/papers'
@@ -53,36 +67,41 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
+  '/create': typeof CreateRoute
   '/papers': typeof PapersRoute
 }
 
 export interface FileRoutesByTo {
   '/about': typeof AboutRoute
+  '/create': typeof CreateRoute
   '/papers': typeof PapersRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/about': typeof AboutRoute
+  '/create': typeof CreateRoute
   '/papers': typeof PapersRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/about' | '/papers'
+  fullPaths: '/about' | '/create' | '/papers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about' | '/papers'
-  id: '__root__' | '/about' | '/papers'
+  to: '/about' | '/create' | '/papers'
+  id: '__root__' | '/about' | '/create' | '/papers'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
+  CreateRoute: typeof CreateRoute
   PapersRoute: typeof PapersRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
+  CreateRoute: CreateRoute,
   PapersRoute: PapersRoute,
 }
 
@@ -97,11 +116,15 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/about",
+        "/create",
         "/papers"
       ]
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/create": {
+      "filePath": "create.tsx"
     },
     "/papers": {
       "filePath": "papers.tsx"

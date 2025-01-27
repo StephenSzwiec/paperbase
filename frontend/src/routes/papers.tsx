@@ -15,7 +15,7 @@ import {
   deletePaper,
 } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Trash } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -26,6 +26,8 @@ export const Route = createFileRoute('/papers')({
 function Papers() {
   const { isPending, error, data } = useQuery(getAllPapersQueryOptions)
   const { data: loadingCreatePaper } = useQuery(loadingCreatePaperQueryOptions)
+  const queryClient = useQueryClient()
+
   if (error) return 'An error has occurred: ' + error.message
 
   return (
@@ -58,7 +60,7 @@ function Papers() {
             </TableRow>
           )}
           {isPending
-            ? Array(5)
+            ? Array(6)
                 .fill(0)
                 .map((_, i) => (
                   <TableRow key={i}>
@@ -91,12 +93,8 @@ function Papers() {
                   <TableCell>{paper.journal}</TableCell>
                   <TableCell>{paper.volume}</TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => {
-                        // do nothing for now
-                      }}
-                      icon={<Trash />}
-                    />
+                    <PaperEditButton id={paper.id} />
+                    <PaperDeleteButton id={paper.id} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -106,5 +104,50 @@ function Papers() {
   )
 }
 
-// function PaperDeleteButton({ id }: { id: number }) {
-//
+function PaperEditButton({ id }) {
+  return (
+    <Button
+      className="mr-2"
+      onClick={() => {
+        toast('Edit not implemented yet')
+      }}
+    >
+      Edit
+    </Button>
+  )
+}
+
+function PaperDeleteButton({ id }: { id: number }) {
+    const queryClient = useQueryClient()
+    const mutation = useMutation({
+        mutationFn: deletePaper,
+        onError: () => { 
+            toast("Error", {
+                description: `Failed to delete paper with id ${id}`
+            });
+        },
+        onSuccess: () => {
+            toast("Paper Deleted", {
+                description: `Paper with id ${id} has been deleted`
+            });
+            queryClient.setQueryData(
+                getAllPapersQueryOptions.queryKey,
+                (existingPapers) => ({
+                    ...existingPapers,
+                    papers: existingPapers!.papers.filter((paper) => paper.id !== id),
+                })
+            );
+        },
+    });
+
+    return (
+        <Button
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate({ id })}
+            variant="outline"
+            size="icon"
+        >
+            {mutation.isPending ? "..." : <Trash className="h-4 w-4" />}
+        </Button>
+    );
+}
