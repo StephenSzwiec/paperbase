@@ -11,9 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PapersImport } from './routes/papers'
 import { Route as AboutImport } from './routes/about'
 
 // Create/Update Routes
+
+const PapersRoute = PapersImport.update({
+  id: '/papers',
+  path: '/papers',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AboutRoute = AboutImport.update({
   id: '/about',
@@ -32,6 +39,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/papers': {
+      id: '/papers'
+      path: '/papers'
+      fullPath: '/papers'
+      preLoaderRoute: typeof PapersImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
+  '/papers': typeof PapersRoute
 }
 
 export interface FileRoutesByTo {
   '/about': typeof AboutRoute
+  '/papers': typeof PapersRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/about': typeof AboutRoute
+  '/papers': typeof PapersRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/about'
+  fullPaths: '/about' | '/papers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about'
-  id: '__root__' | '/about'
+  to: '/about' | '/papers'
+  id: '__root__' | '/about' | '/papers'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
+  PapersRoute: typeof PapersRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
+  PapersRoute: PapersRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +96,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/about"
+        "/about",
+        "/papers"
       ]
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/papers": {
+      "filePath": "papers.tsx"
     }
   }
 }

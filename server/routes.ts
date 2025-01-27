@@ -62,6 +62,25 @@ export const papersRoute = new Hono()
             return c.notFound();
         }
         return c.json({ paper : paper });
+    })
+    .put("/:id", zValidator("json", createPaperSchema), async (c) => {
+        // we cannot allow the user to change the id of the paper
+        // so we will ignore the id in the request body
+        // and use the id from the URL
+        const paper = await c.req.valid("json");
+        const id = Number.parseInt(c.req.param("id"));
+        const validatedPaper = insertPapersSchema.parse({
+            ...paper, id });
+        const result = await db
+            .update(paperTable)
+            .set(validatedPaper)
+            .where(eq(paperTable.id, id))
+            .returning()
+            .then((res) => res[0]);
+        if(!result) {
+            return c.notFound();
+        }
+        return c.json(result);
     });
 
 export const compoundsRoute = new Hono()
@@ -86,6 +105,15 @@ export const compoundsRoute = new Hono()
 
         return c.json({ compound });
     })
+    .get("/paper/:id", async (c) => {
+        const paperId = Number.parseInt(c.req.param("id"));
+        const compounds = await db
+            .select()
+            .from(compoundTable)
+            .where(eq(compoundTable.paperId, paperId))
+            .all();
+        return c.json({ compounds });
+    })
     .post("/", zValidator("json", createCompoundSchema), async (c) => {
         const compound = await c.req.valid("json");
         const validatedCompound = insertCompoundsSchema.parse({
@@ -109,4 +137,23 @@ export const compoundsRoute = new Hono()
             return c.notFound();
         }
         return c.json({ compound : compound });
+    })
+    .put("/:id", zValidator("json", createCompoundSchema), async (c) => {
+        // we cannot allow the user to change the id of
+        // the compound so we will ignore the id in the request body
+        // and use the id from the URL
+        const compound = await c.req.valid("json");
+        const id = Number.parseInt(c.req.param("id"));
+        const validatedCompound = insertCompoundsSchema.parse({
+            ...compound, id });
+        const result = await db
+            .update(compoundTable)
+            .set(validatedCompound)
+            .where(eq(compoundTable.id, id))
+            .returning()
+            .then((res) => res[0]);
+        if(!result) {
+            return c.notFound();
+        }
+        return c.json(result);
     });

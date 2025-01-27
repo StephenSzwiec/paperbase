@@ -1,4 +1,4 @@
-import { hc } from "hono/cilent";
+import { hc } from "hono/client";
 import { type ApiRoutes } from "@server/app";
 import { queryOptions, useQuery, useMutation } from "@tanstack/react-query";
 import { type CreatePaper } from "@server/sharedTypes";
@@ -7,7 +7,7 @@ const client = hc<ApiRoutes>("/");
 
 export const api = client.api;
 
-async function getAllPapers = () => {
+export async function getAllPapers() {
     const res = await api.papers.$get();
     if (!res.ok) { 
         throw new Error("Failed to fetch papers"); 
@@ -22,29 +22,37 @@ export const getAllPapersQueryOptions = queryOptions({
     staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
-async function useGetPaper = (paperId: number) => {
-    return useQuery({
-        queryKey: ["paper", paperId],
-        queryFn: async () => {
-            const res = await api.papers[":id".$get({
-                param: { id: paperId.toString() },
-            });
-            return await res.json();
-        },
-        staleTime: 1000 * 60 * 5, // 5 minutes
+export async function getPaper(paperId: number) {
+    const res = await api.papers[":id"].$get({
+        param: { id: paperId.toString() },
     });
+    if (!res.ok) {
+        throw new Error("Failed to fetch paper");
+    }
+    const paper = await res.json();
+    return paper;
 };
 
-async function createPaper({ input } : { input: CreatePaper }) {
+export async function createPaper({ input } : { input: CreatePaper }) {
     const res = await api.papers.$post({ json: input });
     if (!res.ok) {
         throw new Error("Failed to create paper");
     }
     const newPaper = await res.json();
     return newPaper;
-}
+};
 
-async function updatePaper = ( paperId: number, input: CreatePaper ) => {
+export const loadingCreatePaperQueryOptions = queryOptions<{
+    paper?: CreatePaper, 
+}>({
+    queryKey: ["loading-create-paper"],
+    queryFn: async () => {
+        return {};
+    },
+    staleTime: Infinity
+});
+
+export async function updatePaper( paperId: number, input: CreatePaper ) {
     const res = await api.papers[":id"].$put({
         param: { id: paperId.toString() },
         json: input,
@@ -56,7 +64,7 @@ async function updatePaper = ( paperId: number, input: CreatePaper ) => {
     return updatedPaper;
 };
 
-async function deletePaper = (paperId: number) => {
+export async function deletePaper(paperId: {id: number}) {
     const res = await api.papers[":id"].$delete({
         param: { id: paperId.toString() },
     });

@@ -3,6 +3,7 @@ import {
     Link,
     Outlet,
 } from "@tanstack/react-router";
+import { Footer } from "../components/ui/footer";
 import { type QueryClient } from "@tanstack/react-query";
 
 interface MyRouterContext {
@@ -34,7 +35,8 @@ function Root() {
             <div className="p-2 max-w-2xl m-auto">
                 <Outlet />
             </div>
-            {/* <Footer /> */}
+            <hr />
+            <Footer />
         </>
     );
 }
