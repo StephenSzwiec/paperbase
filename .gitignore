@@ -173,3 +173,10 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# py venv 
+venv
+
+# node_modules
+node_modules
+

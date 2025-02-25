@@ -1,0 +1,52 @@
+body {
+    overflow-x: hidden;
+}
+
+.sidebar {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+#pdfViewer {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: auto;
+    border: 1px solid #ddd;
+}
+
+#pdfCanvas {
+    display: block;
+    margin: 0 auto;
+}
+
+#selectionOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    border: 2px solid blue;
+    background-color: rgba(0, 0, 255, 0.1);
+    display: none;
+}
+
+#capturedImage {
+    max-width: 100%;
+    border: 1px solid #ddd;
+    min-height: 100px;
+    background-color: #fff;
+}
+
+.compound-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.compound-image {
+    max-width: 100%;
+    margin-bottom: 10px;
+}
