@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "bun run server.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ext .ts"
+    "typecheck": "bun run typecheck",
+    "lint": "eslint . --ext .ts",
+    "dev": "bun --watch run server.ts"
   },
   "keywords": [],
   "author": "",

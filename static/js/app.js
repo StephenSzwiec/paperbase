@@ -1,9 +1,41 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-const pdfHandler = new PDFHandler();
-const compoundManager = new CompoundManager();
-window.pdfHandler = pdfHandler;
-window.compoundManager = compoundManager;
+// Check if a project is active before initializing the app
+async function checkActiveProject() {
+    try {
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (!data.activeProject) {
+            // No active project, redirect to projects page
+            window.location.href = 'projects.html';
+            return false;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error checking active project:', error);
+        // If there's an error, we'll still try to initialize
+        return true;
+    }
+}
+
+// Initialize app only if a project is active
+async function initApp() {
+    const hasActiveProject = await checkActiveProject();
+    if (!hasActiveProject) return;
+    
+    const pdfHandler = new PDFHandler();
+    const compoundManager = new CompoundManager();
+    window.pdfHandler = pdfHandler;
+    window.compoundManager = compoundManager;
+    
+    // Initial load
+    loadPDFList();
+}
+
+// Start the app
+initApp();
 
 document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -89,5 +121,4 @@ async function deletePDF(id, event) {
     }
 }
 
-// Initial load
-loadPDFList();
+// Remove this as we now call loadPDFList() in initApp

@@ -50,3 +50,50 @@ body {
     max-width: 100%;
     margin-bottom: 10px;
 }
+
+/* Project list styling */
+.list-group-item.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.list-group-item.active small.text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.list-group-item.active .btn-light {
+    background-color: #fff;
+    color: #0d6efd;
+    font-weight: bold;
+    border-color: #fff;
+}
+
+.list-group-item.active .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+}
+
+/* Compounds table styling */
+#compoundsTable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#compoundsTable td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#compoundsTable .tooltip {
+    white-space: normal;
+    max-width: 300px;
+}
+
+/* Ensure structure images don't break layout */
+#compoundsTable td:nth-child(2) {
+    white-space: normal;
+    text-align: center;
+}

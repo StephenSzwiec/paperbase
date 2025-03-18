@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paperbase - Projects</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="static/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation bar container -->
+    <div id="navbar-container"></div>
+    
+    <!-- About modal container -->
+    <div id="about-container"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="bi bi-folder"></i> Manage Projects</h4>
+                        <button id="createProjectBtn" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+                            <i class="bi bi-plus-circle"></i> New Project
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="projectsList" class="list-group">
+                            <!-- Projects will be listed here -->
+                            <div class="text-center p-5" id="noProjectsMessage">
+                                <i class="bi bi-folder-x" style="font-size: 3rem;"></i>
+                                <p class="mt-3">No projects found. Create a new project to get started.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Project Modal -->
+    <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createProjectModalLabel">Create New Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createProjectForm">
+                        <div class="mb-3">
+                            <label for="projectName" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="projectName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectLocation" class="form-label">Project Location</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="projectLocation" value="~/.local/state/paperbase" disabled>
+                            </div>
+                            <small class="text-muted">Projects are stored in your user data directory</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Chemical Data Fields</label>
+                            <p class="small text-muted">Define the data fields for chemical compounds in this project</p>
+                            
+                            <div id="dataFields">
+                                <!-- Initial field -->
+                                <div class="data-field row mb-2">
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control field-name" placeholder="Field name" required>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <select class="form-select field-type">
+                                            <option value="number">Numeric</option>
+                                            <option value="string">Text (categorical)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-outline-danger remove-field">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" id="addFieldBtn" class="btn btn-outline-secondary mt-2">
+                                <i class="bi bi-plus-circle"></i> Add Field
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="saveProjectBtn" class="btn btn-primary">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Project Modal -->
+    <div class="modal fade" id="editProjectModal" tabindex="-1" aria-labelledby="editProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editProjectModalLabel">Edit Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProjectForm">
+                        <input type="hidden" id="editProjectId">
+                        <div class="mb-3">
+                            <label for="editProjectName" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="editProjectName" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Chemical Data Fields</label>
+                            <p class="small text-muted">Edit data fields for chemical compounds in this project</p>
+                            <p class="small text-danger">Warning: Removing fields will delete that data from existing compounds</p>
+                            
+                            <div id="editDataFields">
+                                <!-- Fields will be added dynamically -->
+                            </div>
+                            
+                            <button type="button" id="editAddFieldBtn" class="btn btn-outline-secondary mt-2">
+                                <i class="bi bi-plus-circle"></i> Add Field
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="updateProjectBtn" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/navbar.js"></script>
+    <script src="static/js/project-manager.js"></script>
+</body>
+</html>

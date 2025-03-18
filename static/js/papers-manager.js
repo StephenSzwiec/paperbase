@@ -122,22 +122,139 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // PDF.js variables
+    let pdfDoc = null;
+    let pageNum = 1;
+    let pageRendering = false;
+    let pageNumPending = null;
+    let canvas = document.getElementById('pdfCanvas');
+    let ctx = canvas ? canvas.getContext('2d') : null;
+    let scale = 1.0;
+    
     // View PDF
     async function viewPdf(paperId) {
         try {
-            // Create a blob URL for the PDF
-            const pdfUrl = `/api/pdfs/${paperId}`;
+            // Create a URL for the PDF with explicit inline viewing parameter
+            const pdfUrl = `/api/pdfs/${paperId}?inline=true`;
             
-            // Set the iframe source
-            document.getElementById('pdfViewer').src = pdfUrl;
+            // Reset PDF viewer state
+            pageNum = 1;
             
-            // Show the modal
+            // Show the modal first so canvas is visible for rendering
             const viewPdfModal = new bootstrap.Modal(document.getElementById('viewPdfModal'));
             viewPdfModal.show();
+            
+            // Show loading indicator
+            document.getElementById('pdfLoadingIndicator').style.display = 'block';
+            document.getElementById('pdfCanvas').style.display = 'none';
+            
+            // Ensure canvas is ready
+            canvas = document.getElementById('pdfCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set up button event listeners
+            document.getElementById('prevPage').onclick = onPrevPage;
+            document.getElementById('nextPage').onclick = onNextPage;
+            
+            // Load the PDF using PDF.js
+            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            loadingTask.promise.then(function(pdf) {
+                pdfDoc = pdf;
+                document.getElementById('pageInfo').textContent = `Page: ${pageNum}/${pdfDoc.numPages}`;
+                
+                // Hide loading indicator and show canvas
+                document.getElementById('pdfLoadingIndicator').style.display = 'none';
+                document.getElementById('pdfCanvas').style.display = 'block';
+                
+                // Initial render of the first page
+                renderPage(pageNum);
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                document.getElementById('pdfLoadingIndicator').style.display = 'none';
+                showAlert('Error loading PDF: ' + error.message, 'danger');
+            });
         } catch (error) {
             console.error('Error viewing PDF:', error);
+            document.getElementById('pdfLoadingIndicator').style.display = 'none';
             showAlert('Error loading PDF. Please try again.', 'danger');
         }
+    }
+    
+    // Render a specific page of the PDF
+    function renderPage(num) {
+        pageRendering = true;
+        
+        // Get the page
+        pdfDoc.getPage(num).then(function(page) {
+            // Determine scale based on viewport
+            const viewport = page.getViewport({ scale: 1.0 });
+            const container = document.getElementById('pdfViewerContainer');
+            
+            // Calculate available width accounting for padding
+            const availableWidth = container.clientWidth - 30;
+            
+            // Calculate scale to fit width while maintaining aspect ratio
+            const widthScale = availableWidth / viewport.width;
+            
+            // Use a reasonable scale (not too small, not too large)
+            scale = Math.min(Math.max(widthScale, 0.8), 1.8);
+            
+            // Get the viewport at the new scale
+            const scaledViewport = page.getViewport({ scale });
+            
+            // Set canvas dimensions
+            canvas.height = scaledViewport.height;
+            canvas.width = scaledViewport.width;
+            
+            // Render PDF page
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: scaledViewport
+            };
+            
+            const renderTask = page.render(renderContext);
+            
+            // Wait for rendering to finish
+            renderTask.promise.then(function() {
+                pageRendering = false;
+                
+                // If there's a page pending, render it
+                if (pageNumPending !== null) {
+                    renderPage(pageNumPending);
+                    pageNumPending = null;
+                }
+            });
+        });
+        
+        // Update page counter
+        document.getElementById('pageInfo').textContent = `Page: ${num}/${pdfDoc.numPages}`;
+    }
+    
+    // Queue rendering of a page if another rendering is in progress
+    function queueRenderPage(num) {
+        if (pageRendering) {
+            pageNumPending = num;
+        } else {
+            renderPage(num);
+        }
+    }
+    
+    // Go to previous page
+    function onPrevPage() {
+        if (pageNum <= 1) {
+            return;
+        }
+        pageNum--;
+        queueRenderPage(pageNum);
+    }
+    
+    // Go to next page
+    function onNextPage() {
+        if (pdfDoc === null || pageNum >= pdfDoc.numPages) {
+            return;
+        }
+        pageNum++;
+        queueRenderPage(pageNum);
     }
 
     // Edit paper
